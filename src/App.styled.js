@@ -1,7 +1,8 @@
 import styled from "styled-components"
 
-export const span=styled.span`
+export const Today=styled.span`
     margin-left: 10px;
+    margin-right:10px;
 
 `;
 

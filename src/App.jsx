@@ -1,21 +1,37 @@
 import { useState } from 'react'
-import {span} from "./App.styled.js"
+import {Today} from "./App.styled.js"
 import './App.css'
 
 function App() {
   const [count, setCount] = useState(0);
-  const [diameter, setDiameter] = useState(0);
-  const [massaSpool, setMassaSpool] = useState(0);
-  const [price, setPrice] = useState(0);
-  
- 
+  const [diameter, setDiameter] = useState(3);
+  const [massaSpool, setMassaSpool] = useState(800);
+  const [price, setPrice] = useState(100);
+  const [totalMoney,setTotalMoney]=useState(0);
+  const [totalTons,setTotalTons]=useState(0);
+
   const today = new Date();
   const totalMassa = count * massaSpool;
   const totalEarnings=totalMassa/1000*price;
-  /*useEffect(() => {
-   totalMassa=totalMassa+massaSpool;
-  }, [count]);*/
-    
+ 
+  //    functions
+ 
+  const handleIncrement=()=>{
+    const tons=massaSpool/1000;
+    const earningPerSpool=(tons*price);
+    setCount(prev=>prev+1);
+    setTotalMoney(prev=>prev+earningPerSpool)
+    setTotalTons(prev=>prev+tons)
+  }
+
+  const handleDecrement=() =>{
+    if (count<0)return
+     const tons=massaSpool/1000;
+    const earningPerSpool=(tons*price);
+     setCount(prev=>prev-1);
+     setTotalMoney(prev=>prev-earningPerSpool)
+      setTotalTons(prev=>prev-tons)
+  }
 
   return (
     <>
@@ -23,7 +39,7 @@ function App() {
        <h1>Волочіння дроту</h1>
     
         <div>
-          <span>сьогодні</span>
+          <Today>сьогодні</Today>
           {today.toLocaleDateString()}
         </div>
 
@@ -54,12 +70,12 @@ function App() {
                type='number' 
                value={count}
                onChange={(e)=> setCount(Number(e.target.value))}></input>
-        <button onClick={() => setCount(count + 1)}>▲</button>
-        <button onClick={() => setCount(count - 1)}>▼</button>
+        <button onClick={handleIncrement}>▲</button>
+        <button onClick={handleDecrement}>▼</button>
       </div>
       <div>
-        <p>всього тон {totalMassa}</p>
-        <p>всього заробив - {totalEarnings}</p>
+        <p>всього тон {totalMassa/1000}</p>
+        <p>всього заробив - {totalMoney}</p>
       </div>      
       </div>
      
