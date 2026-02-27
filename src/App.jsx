@@ -9,10 +9,11 @@ function App() {
   const [price, setPrice] = useState(100);
   const [totalMoney,setTotalMoney]=useState(0);
   const [totalTons,setTotalTons]=useState(0);
+  const [results, setResults] = useState([]);
 
   const today = new Date();
-  const totalMassa = count * massaSpool;
-  const totalEarnings=totalMassa/1000*price;
+  
+  
  
   //    functions
  
@@ -25,12 +26,36 @@ function App() {
   }
 
   const handleDecrement=() =>{
-    if (count<0)return
+    if (count<=0)return
      const tons=massaSpool/1000;
     const earningPerSpool=(tons*price);
      setCount(prev=>prev-1);
      setTotalMoney(prev=>prev-earningPerSpool)
       setTotalTons(prev=>prev-tons)
+  }
+
+  const handleNewDiameter = () => {
+    if (count === 0) {
+      alert('Спочатку введіть кількість шпуль');
+      return;
+    }
+    
+    // Зберігаємо результати
+    setResults([...results, {
+      diameter,
+      price,
+      countSpool: count,
+      totalMoney,
+      totalTons
+    }]);
+    
+    // Обнуляємо поля для нового діаметру та ціни
+    setDiameter('');
+    setPrice('');
+    setCount(0);
+    setTotalMoney(0);
+    setTotalTons(0);
+    setMassaSpool(800); // Можна залишити попереднє значення
   }
 
   return (
@@ -48,7 +73,7 @@ function App() {
           <input  id='diameter' 
                   type ='number' 
                   value={diameter}
-                  onChange={(e)=> setDiameter(e.target.value)}></input>
+                  onChange={(e)=> setDiameter(Number(e.target.value))}></input>
         </div>
       <div>
         <span>Кілограм на шпулі</span>
@@ -62,7 +87,7 @@ function App() {
         <input  id='price' 
                 type='number' 
                 value={price}
-                onChange={(e)=> setPrice(e.target.value)}></input>
+                onChange={(e)=> setPrice(Number(e.target.value))}></input>
       </div>
       <div>
         <span>кількість шпуль</span>
@@ -73,10 +98,26 @@ function App() {
         <button onClick={handleIncrement}>▲</button>
         <button onClick={handleDecrement}>▼</button>
       </div>
+      <button onClick={handleNewDiameter}>Новий діаметр</button>
       <div>
-        <p>всього тон {totalMassa/1000}</p>
-        <p>всього заробив - {totalMoney}</p>
-      </div>      
+        <p>всього заробив - {totalMoney.toFixed(2)}</p>
+        <p>всього тон за сесію - {totalTons.toFixed(2)}</p>
+      </div>
+
+      {results.length > 0 && (
+        <div style={{marginTop: '20px', borderTop: '2px solid #ccc', paddingTop: '20px'}}>
+          <h3>Збережені результати</h3>
+          {results.map((result, index) => (
+            <div key={index} style={{marginBottom: '10px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '5px'}}>
+              <p><strong>Діаметр:</strong> {result.diameter} мм</p>
+              <p><strong>Ціна за тону:</strong> {result.price} грн</p>
+              <p><strong>Кількість шпуль:</strong> {result.countSpool}</p>
+              <p><strong>Тон:</strong> {result.totalTons.toFixed(2)}</p>
+              <p><strong>Заробив:</strong> {result.totalMoney.toFixed(2)} грн</p>
+            </div>
+          ))}
+        </div>
+      )}
       </div>
      
     </>
