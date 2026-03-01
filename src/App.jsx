@@ -71,7 +71,7 @@ function App() {
         <div>
           <span>Діаметр дроту</span>
           <input  id='diameter' 
-                  type ='number' 
+                  type ='float' 
                   value={diameter}
                   onChange={(e)=> setDiameter(Number(e.target.value))}></input>
         </div>
@@ -85,7 +85,7 @@ function App() {
        <div>
         <span>ціна за тону</span>
         <input  id='price' 
-                type='number' 
+                type='float' 
                 value={price}
                 onChange={(e)=> setPrice(Number(e.target.value))}></input>
       </div>
