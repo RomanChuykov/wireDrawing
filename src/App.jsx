@@ -73,6 +73,7 @@ function App() {
           <input  id='diameter' 
                   type="number"
                   step="0.01"
+                  inputMode="decimal"
                   value={diameter}
                   onChange={(e)=> setDiameter(Number(e.target.value))}></input>
         </div>
@@ -88,6 +89,7 @@ function App() {
         <input  id='price' 
                 type="number"
                 step="0.01"
+                inputMode="decimal"
                 value={price}
                 onChange={(e)=> setPrice(Number(e.target.value))}></input>
       </div>
