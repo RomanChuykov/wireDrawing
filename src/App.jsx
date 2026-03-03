@@ -4,9 +4,9 @@ import './App.css'
 
 function App() {
   const [count, setCount] = useState(0);
-  const [diameter, setDiameter] = useState('3');
+  const [diameter, setDiameter] = useState(3.00);
   const [massaSpool, setMassaSpool] = useState(800);
-  const [price, setPrice] = useState('100');
+  const [price, setPrice] = useState(100.00);
   const [totalMoney,setTotalMoney]=useState(0);
   const [totalTons,setTotalTons]=useState(0);
   const [results, setResults] = useState([]);
@@ -28,7 +28,7 @@ function App() {
   const handleDecrement=() =>{
     if (count<=0)return
      const tons=massaSpool/1000;
-    const earningPerSpool=(tons*parseFloat(price));
+    const earningPerSpool=(tons*price);
      setCount(prev=>prev-1);
      setTotalMoney(prev=>prev-earningPerSpool)
       setTotalTons(prev=>prev-tons)
@@ -50,8 +50,8 @@ function App() {
     }]);
     
     // Обнуляємо поля для нового діаметру та ціни
-    setDiameter('');
-    setPrice('');
+    setDiameter(3.00);
+    setPrice(100.00);
     setCount(0);
     setTotalMoney(0);
     setTotalTons(0);
@@ -75,7 +75,9 @@ function App() {
                   step="0.01"
                   inputMode="decimal"
                   value={diameter}
-                  onChange={(e)=> setDiameter(e.target.value)}></input>
+                  onChange={(e) => {
+                    const value = e.target.value.replace(',', '.');
+                    setDiameter(Number(value));}}></input>
         </div>
       <div>
         <span>Кілограм на шпулі</span>
