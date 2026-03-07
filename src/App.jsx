@@ -2,24 +2,42 @@ import { useState } from 'react'
 import {Today} from "./App.styled.js"
 import './App.css'
 
+/*Коли треба використовувати діаметр у розрахунках:
+
+const diameter = Number(formatDecimal(diameterDigits, 2));*/
+
 function App() {
   const [count, setCount] = useState(0);
-  const [diameter, setDiameter] = useState('3.00');
-  const [massaSpool, setMassaSpool] = useState(800);
-  const [price, setPrice] = useState('100.00');
+  const [diameter, setDiameter] = useState(3);
+  const [massaSpool, setMassaSpool] = useState(850);
+  const [price, setPrice] = useState("");
   const [totalMoney,setTotalMoney]=useState(0);
   const [totalTons,setTotalTons]=useState(0);
   const [results, setResults] = useState([]);
+  const [diameterDigits, setDiameterDigits] = useState("");
 
   const today = new Date();
   
      
  
   //    functions
- 
+const formatDecimal = (digits,decimals=2)=>{
+    if(!digits)return '0.00';
+    const num = parseInt(digits, 10);
+    return (num / Math.pow(10, decimals)).toFixed(decimals);
+  }
+const handleDiameterChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, "");
+    setDiameterDigits(digits); 
+  }
+const handlePriceChange = (e) => {
+    const price = e.target.value.replace(/\D/g, "");
+    setPrice(price);
+    }
+  
   const handleIncrement=()=>{
     const tons=massaSpool/1000;
-    const priceNum = parseFloat(price) || 0;
+    const priceNum = Number(formatDecimal(price,2))//parseFloat(price) || 0;
     const earningPerSpool=(tons*priceNum);
     setCount(prev=>prev+1);
     setTotalMoney(prev=>prev+earningPerSpool)
@@ -29,7 +47,7 @@ function App() {
   const handleDecrement=() =>{
     if (count<=0)return
      const tons=massaSpool/1000;
-    const priceNum = parseFloat(price) || 0;
+    const priceNum =  Number(formatDecimal(price,2)) || 0;
     const earningPerSpool=(tons*priceNum);
      setCount(prev=>prev-1);
      setTotalMoney(prev=>prev-earningPerSpool)
@@ -52,8 +70,8 @@ function App() {
     }]);
     
     // Обнуляємо поля для нового діаметру та ціни
-    setDiameter('3.00');
-    setPrice('100.00');
+    setDiameter('');    
+    setPrice('');
     setCount(0);
     setTotalMoney(0);
     setTotalTons(0);
@@ -73,11 +91,11 @@ function App() {
         <div>
           <span>Діаметр дроту</span>
           <input  id='diameter' 
-                  type="number"
-                  step="0.01"
+                  type="text"
                   inputMode="decimal"
-                  value={diameter}
-                  onChange={(e) => setDiameter(e.target.value)}></input>
+                  step="0.01"
+                  value={formatDecimal(diameterDigits,2)}
+                  onChange={handleDiameterChange}></input>
         </div>
       <div>
         <span>Кілограм на шпулі</span>
@@ -92,8 +110,8 @@ function App() {
                 type="number"
                 step="0.01"
                 inputMode="decimal"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}></input>
+                value={formatDecimal(price,2)}
+                onChange={handlePriceChange}></input>
       </div>
       <div>
         <span>кількість шпуль</span>
