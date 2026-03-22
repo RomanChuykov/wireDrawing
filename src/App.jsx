@@ -2,56 +2,55 @@ import { useState } from 'react'
 import {Today} from "./App.styled.js"
 import './App.css'
 
-/*Коли треба використовувати діаметр у розрахунках:
-
-const diameter = Number(formatDecimal(diameterDigits, 2));*/
-
 function App() {
-  const [count, setCount] = useState(0);
   const [diameter, setDiameter] = useState(3);
-  const [massaSpool, setMassaSpool] = useState(850);
+  const [currentMassa, setCurrentMassa] = useState(850);
   const [price, setPrice] = useState("");
-  const [totalMoney,setTotalMoney]=useState(0);
-  const [totalTons,setTotalTons]=useState(0);
+  const [spools, setSpools] = useState([]); // [{massa: 800}, {massa: 850}, ...]
   const [results, setResults] = useState([]);
   const [diameterDigits, setDiameterDigits] = useState("");
 
   const today = new Date();
-  
-     
- 
-  //    functions
-const formatDecimal = (digits,decimals=2)=>{
-    if(!digits)return '0.00';
+
+  // Розраховані значення з поточних шпуль
+  const totalTons = spools.reduce((sum, s) => sum + s.massa / 1000, 0);
+  const priceNum = Number(formatDecimal(price, 2));
+  const totalMoney = totalTons * priceNum;
+  const count = spools.length;
+
+  function formatDecimal(digits, decimals = 2) {
+    if (!digits) return '0.00';
     const num = parseInt(digits, 10);
     return (num / Math.pow(10, decimals)).toFixed(decimals);
   }
-const handleDiameterChange = (e) => {
+
+  const handleDiameterChange = (e) => {
     const digits = e.target.value.replace(/\D/g, "");
-    setDiameterDigits(digits); 
-  }
-const handlePriceChange = (e) => {
-    const price = e.target.value.replace(/\D/g, "");
-    setPrice(price);
-    }
-  
-  const handleIncrement=()=>{
-    const tons=massaSpool/1000;
-    const priceNum = Number(formatDecimal(price,2))//parseFloat(price) || 0;
-    const earningPerSpool=(tons*priceNum);
-    setCount(prev=>prev+1);
-    setTotalMoney(prev=>prev+earningPerSpool)
-    setTotalTons(prev=>prev+tons)
+    setDiameterDigits(digits);
   }
 
-  const handleDecrement=() =>{
-    if (count<=0)return
-     const tons=massaSpool/1000;
-    const priceNum =  Number(formatDecimal(price,2)) || 0;
-    const earningPerSpool=(tons*priceNum);
-     setCount(prev=>prev-1);
-     setTotalMoney(prev=>prev-earningPerSpool)
-      setTotalTons(prev=>prev-tons)
+  const handlePriceChange = (e) => {
+    const p = e.target.value.replace(/\D/g, "");
+    setPrice(p);
+  }
+
+  const handleAddSpool = () => {
+    setSpools(prev => [...prev, { massa: currentMassa }]);
+  }
+
+  const handleRemoveSpool = () => {
+    if (spools.length === 0) return;
+    setSpools(prev => prev.slice(0, -1));
+  }
+
+  const handleRemoveSpoolAt = (index) => {
+    setSpools(prev => prev.filter((_, i) => i !== index));
+  }
+
+  const handleSpoolMassaChange = (index, value) => {
+    const updated = [...spools];
+    updated[index] = { ...updated[index], massa: Number(value) };
+    setSpools(updated);
   }
 
   const handleNewDiameter = () => {
@@ -59,30 +58,28 @@ const handlePriceChange = (e) => {
       alert('Спочатку введіть кількість шпуль');
       return;
     }
-    
-    // Зберігаємо результати
+
     setResults([...results, {
       diameter,
       price,
       countSpool: count,
       totalMoney,
-      totalTons
+      totalTons,
+      spools: [...spools]
     }]);
-    
-    // Обнуляємо поля для нового діаметру та ціни
-    setDiameter('');    
+
+    setDiameter('');
+    setDiameterDigits('');
     setPrice('');
-    setCount(0);
-    setTotalMoney(0);
-    setTotalTons(0);
-    setMassaSpool(800); // Можна залишити попереднє значення
+    setSpools([]);
+    setCurrentMassa(850);
   }
 
   return (
     <>
       <div>
-       <h1>Волочіння дроту</h1>
-    
+        <h1>Волочіння дроту</h1>
+
         <div>
           <Today>сьогодні</Today>
           {today.toLocaleDateString()}
@@ -90,63 +87,143 @@ const handlePriceChange = (e) => {
 
         <div>
           <span>Діаметр дроту</span>
-          <input  id='diameter' 
-                  type="text"
-                  inputMode="decimal"
-                  step="0.01"
-                  value={formatDecimal(diameterDigits,2)}
-                  onChange={handleDiameterChange}></input>
+          <input
+            id='diameter'
+            type="text"
+            inputMode="decimal"
+            step="0.01"
+            value={formatDecimal(diameterDigits, 2)}
+            onChange={handleDiameterChange}
+          />
         </div>
-      <div>
-        <span>Кілограм на шпулі</span>
-        <input  id='massaSpool' 
-                type='number' 
-                value={massaSpool}
-                onChange={(e)=> setMassaSpool(Number(e.target.value))}></input>
-      </div>
-       <div>
-        <span>ціна за тону</span>
-        <input  id='price' 
-                type="number"
-                step="0.01"
-                inputMode="decimal"
-                value={formatDecimal(price,2)}
-                onChange={handlePriceChange}></input>
-      </div>
-      <div>
-        <span>кількість шпуль</span>
-        <input id='countSpool' 
-               type='number' 
-               value={count}
-               onChange={(e)=> setCount(Number(e.target.value))}></input>
-        <button onClick={handleIncrement}>▲</button>
-        <button onClick={handleDecrement}>▼</button>
-      </div>
-      <button onClick={handleNewDiameter}>Новий діаметр</button>
-      <div>
-        <p>всього заробив - {totalMoney.toFixed(2)}</p>
-        <p>всього тон за сесію - {totalTons.toFixed(2)}</p>
-      </div>
 
-      {results.length > 0 && (
-        <div style={{marginTop: '20px', borderTop: '2px solid #ccc', paddingTop: '20px'}}>
-          <h3>Збережені результати</h3>
-          {results.map((result, index) => (
-            <div key={index} style={{marginBottom: '10px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '5px'}}>
-              <p><strong>Діаметр:</strong> {result.diameter} мм</p>
-              <p><strong>Ціна за тону:</strong> {result.price} грн</p>
-              <p><strong>Кількість шпуль:</strong> {result.countSpool}</p>
-              <p><strong>Тон:</strong> {result.totalTons.toFixed(2)}</p>
-              <p><strong>Заробив:</strong> {result.totalMoney.toFixed(2)} грн</p>
-            </div>
-          ))}
+        <div>
+          <span>ціна за тону</span>
+          <input
+            id='price'
+            type="text"
+            step="0.01"
+            inputMode="decimal"
+            value={formatDecimal(price, 2)}
+            onChange={handlePriceChange}
+          />
         </div>
-      )}
+
+        {/* Додавання шпуль */}
+        <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#f0f4ff', borderRadius: '8px' }}>
+          <h4 style={{ margin: '0 0 8px 0' }}>Додати шпулю</h4>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>Маса (кг):</span>
+            <input
+              type='number'
+              value={currentMassa}
+              onChange={(e) => setCurrentMassa(Number(e.target.value))}
+              style={{ width: '80px' }}
+            />
+            <button onClick={handleAddSpool}>▲ Додати</button>
+            <button onClick={handleRemoveSpool} disabled={count === 0}>▼ Видалити останню</button>
+          </div>
+        </div>
+
+        {/* Список шпуль */}
+        {spools.length > 0 && (
+          <div style={{ marginTop: '12px' }}>
+            <strong>Шпулі ({count} шт.):</strong>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
+              {spools.map((spool, index) => (
+                <div
+                  key={index}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '4px 8px',
+                    backgroundColor: '#e8f0fe',
+                    borderRadius: '6px',
+                    fontSize: '14px'
+                  }}
+                >
+                  <span>#{index + 1}</span>
+                  <input
+                    type='number'
+                    value={spool.massa}
+                    onChange={(e) => handleSpoolMassaChange(index, e.target.value)}
+                    style={{ width: '65px', fontSize: '13px', padding: '2px 4px' }}
+                  />
+                  <span>кг</span>
+                  <button
+                    onClick={() => handleRemoveSpoolAt(index)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: '#999',
+                      fontSize: '12px',
+                      padding: '0 2px'
+                    }}
+                    title="Видалити"
+                  >✕</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <button onClick={handleNewDiameter} style={{ marginTop: '16px' }}>
+          Новий діаметр
+        </button>
+
+        <div>
+          <p>всього заробив - {totalMoney.toFixed(2)}</p>
+          <p>всього тон за сесію - {totalTons.toFixed(3)}</p>
+          <p>кількість шпуль - {count}</p>
+        </div>
+
+        {results.length > 0 && (
+          <div style={{ marginTop: '20px', borderTop: '2px solid #ccc', paddingTop: '20px' }}>
+            <h3>Збережені результати</h3>
+            {results.map((result, index) => (
+              <div
+                key={index}
+                style={{
+                  marginBottom: '10px',
+                  padding: '10px',
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: '5px'
+                }}
+              >
+                <p><strong>Діаметр:</strong> {result.diameter} мм</p>
+                <p><strong>Ціна за тону:</strong> {result.price} грн</p>
+                <p><strong>Кількість шпуль:</strong> {result.countSpool}</p>
+                <p><strong>Тон:</strong> {result.totalTons.toFixed(3)}</p>
+                <p><strong>Заробив:</strong> {result.totalMoney.toFixed(2)} грн</p>
+                <details>
+                  <summary style={{ cursor: 'pointer', color: '#555', fontSize: '13px' }}>
+                    Деталі шпуль
+                  </summary>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '6px' }}>
+                    {result.spools.map((s, i) => (
+                      <span
+                        key={i}
+                        style={{
+                          padding: '2px 8px',
+                          backgroundColor: '#dde8ff',
+                          borderRadius: '4px',
+                          fontSize: '13px'
+                        }}
+                      >
+                        #{i + 1}: {s.massa} кг
+                      </span>
+                    ))}
+                  </div>
+                </details>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-     
     </>
   )
 }
-
 
 export default App;
