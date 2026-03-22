@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import {Today} from "./App.styled.js"
+import {Today, Legend, InputNumber, Container} from "./App.styled.js"
 import './App.css'
 
 function App() {
@@ -52,14 +52,12 @@ function App() {
     updated[index] = { ...updated[index], massa: Number(value) };
     setSpools(updated);
   }
-
+// Збереження результатів при переході на новий діаметр
   const handleNewDiameter = () => {
-    if (count === 0) {
-      alert('Спочатку введіть кількість шпуль');
-      return;
-    }
+    const newDiametrQuestion=confirm('Переходимо на новий діаметр?');
+    if (!newDiametrQuestion) return;
 
-    setResults([...results, {
+    setResults([...results, {  
       diameter,
       price,
       countSpool: count,
@@ -77,8 +75,8 @@ function App() {
 
   return (
     <>
-      <div>
-        <h1>Калькулятор</h1>
+      <Container>
+        <h1>Калькулятор </h1>
         <h2> Волочіння дроту </h2>
         <div>
           <Today>сьогодні</Today>
@@ -86,21 +84,20 @@ function App() {
         </div>
 
         <div>
-          <span>Діаметр дроту</span>
-          <input
+          <Legend>Діаметр дроту</Legend>
+          <InputNumber
             id='diameter'
             type="text"
             inputMode="decimal"
             step="0.01"
-            value={diameterDigits}
-            //{formatDecimal(diameterDigits, 2)}
+            value={formatDecimal(diameterDigits, 2)}
             onChange={handleDiameterChange}
           />
         </div>
 
         <div>
-          <span>ціна за тону</span>
-          <input
+          <Legend>ціна за тону</Legend>
+          <InputNumber
             id='price'
             type="text"
             step="0.01"
@@ -149,7 +146,7 @@ function App() {
                     type='number'
                     value={spool.massa}
                     onChange={(e) => handleSpoolMassaChange(index, e.target.value)}
-                    style={{ width: '65px', fontSize: '13px', padding: '2px 4px' }}
+                    style={{ width: '35px', fontSize: '13px', padding: '2px 4px' }}
                   />
                   <span>кг</span>
                   <button
@@ -222,7 +219,7 @@ function App() {
             ))}
           </div>
         )}
-      </div>
+      </Container>
     </>
   )
 }
