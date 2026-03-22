@@ -78,8 +78,8 @@ function App() {
   return (
     <>
       <div>
-        <h1>Волочіння дроту</h1>
-
+        <h1>Калькулятор</h1>
+        <h2> Волочіння дроту </h2>
         <div>
           <Today>сьогодні</Today>
           {today.toLocaleDateString()}
