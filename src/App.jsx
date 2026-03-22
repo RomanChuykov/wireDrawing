@@ -92,7 +92,8 @@ function App() {
             type="text"
             inputMode="decimal"
             step="0.01"
-            value={formatDecimal(diameterDigits, 2)}
+            value={diameterDigits}
+            //{formatDecimal(diameterDigits, 2)}
             onChange={handleDiameterChange}
           />
         </div>
