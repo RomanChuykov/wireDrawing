@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import {Today, Legend, InputNumber, Container} from "./App.styled.js"
 import './App.css'
+import stan6 from './Data/6.json';
+import stan9 from './Data/9.json';
 
 function App() {
   const [diameter, setDiameter] = useState(3);
@@ -9,7 +11,10 @@ function App() {
   const [spools, setSpools] = useState([]); // [{massa: 800}, {massa: 850}, ...]
   const [results, setResults] = useState([]);
   const [diameterDigits, setDiameterDigits] = useState("");
-
+  const [numberStan, setNumberStan]=useState(0);
+  const [katanka, setKatanka]=useState('');
+  const [zamina, setZamina]=useState('');
+  const [stan, setStan] = useState('')
   const today = new Date();
 
   // Розраховані значення з поточних шпуль
@@ -82,8 +87,14 @@ function App() {
           <Today>сьогодні</Today>
           {today.toLocaleDateString()}
         </div>
-
+        
         <div>
+          <Legend>Введіть № стана</Legend>
+          <select value={stan} onChange={(e) => setStan(e.target.value)}>
+            <option value="">-- Виберіть номер стана --</option>
+            <option value="6">Стан № 6</option>
+            <option value="9">Стан № 9</option>
+          </select>
           <Legend>Діаметр дроту</Legend>
           <InputNumber
             id='diameter'
@@ -94,8 +105,52 @@ function App() {
             onChange={handleDiameterChange}
           />
         </div>
+        <div>
+           <select value={katanka} onChange={(e) => setKatanka(e.target.value)}>
+            <option value="">-- Виберіть тип катанки --</option>
+            <option value="1">Торгова</option>
+            <option value="19">Пружинний</option>
+            <option value="21">Торговий з окаліноломателем</option>
+            <option value="26">Напівфабрикат для фібри</option>
+            <option value="29">Пружинний з окаліноломателем</option>
+            <option value="A400S">A400S</option>
+            <option value="A400S">A400S</option>
+            <option value="A400S">A400S</option>
+            <option value="A400S">A400S</option>
+          </select>
+        </div>
+        <div>
+           <select value={zamina} onChange={(e) => setZamina(e.target.value)}>
+            <option value="">-- Заміна --</option>
+            <option value="0">великовантажні мотки</option>
+            <option value="4">великовантажні мотки переробна заготівля</option>
+            <option value="16">мотки 400-600 кг</option>
+            <option value="A400S">A400S</option>
+            <option value="A400S">A400S</option>
+            <option value="A400S">A400S</option>
+            <option value="A400S">A400S</option>
+            <option value="A400S">A400S</option>
+            <option value="A400S">A400S</option>
+          </select>
+        </div>
 
         <div>
+          
+           <select value={katanka} onChange={(e) => setKatanka(e.target.value)}>
+            <option value="">-- Виберіть тип катанки --</option>
+            <option value="1">Торгова</option>
+            <option value="19">Пружинний</option>
+            <option value="21">Торговий з окаліноломателем</option>
+            <option value="26">Напівфабрикат для фібри</option>
+            <option value="29">Пружинний з окаліноломателем</option>
+            <option value="A400S">A400S</option>
+            <option value="A400S">A400S</option>
+            <option value="A400S">A400S</option>
+            <option value="A400S">A400S</option>
+          </select>
+        </div>
+        <div>
+          
           <Legend>ціна за тону</Legend>
           <InputNumber
             id='price'
