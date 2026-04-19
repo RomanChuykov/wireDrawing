@@ -2,6 +2,7 @@ import styled from "styled-components"
 
 export const Container = styled.div`
   width:360px;
+  background-color:#ccc;
 `;
 export const Today=styled.span`
     margin-left: 10px;
@@ -10,7 +11,7 @@ export const Today=styled.span`
 `;
 export const Legend=styled.span`
     display: inline-block;
-    width: 120px;
+    width: 200px;
     margin-left: 10px;
     margin-right:10px;
 `;
