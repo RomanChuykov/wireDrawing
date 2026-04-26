@@ -5,17 +5,27 @@ import stan6 from './Data/6.json';
 import stan9 from './Data/9.json';
 
 function App() {
-  const [diameter, setDiameter] = useState(3);
+  //const [diameter, setDiameter] = useState(3);
+  const [stan, setStan] = useState(()=> {
+    const savedStan = localStorage.getItem('stan');
+    return savedStan ? savedStan : '';
+  });
+  const [replasement, setreplasement]=useState(()=> {
+    const zamina = localStorage.getItem('zamina');
+    return zamina ? zamina : '';
+  });
+  const [katanka, setKatanka]=useState(()=> {
+    const typeKatanki = localStorage.getItem('katanka');
+    return typeKatanki ? typeKatanki : '';
+  });
+
   const [currentMassa, setCurrentMassa] = useState(850);
   const [spools, setSpools] = useState([]); // [{massa: 800}, {massa: 850}, ...]
   const [results, setResults] = useState([]);
   const [diameterDigits, setDiameterDigits] = useState("");
-  const [numberStan, setNumberStan]=useState('');
-  const [katanka, setKatanka]=useState('');
-  const [replasement, setreplasement]=useState('');
-  const [stan, setStan] = useState('')
   const [initDiameter,setInitDiameter]= useState("")
   const [price, setPrice] = useState('');
+  const [findDiameter, setFindDiameter] = useState('');
   const [speed, setSpeed] = useState('');
   const [production, setProduction] = useState('');
   const [timeNorm, setTimeNorm] = useState('');
@@ -52,8 +62,8 @@ function App() {
   } 
 
   const handlePriceChange = (e) => {
-    const p = e.target.value.replace(/\D/g, "");
-    setPrice(p);
+   // const p = e.target.value  );
+    setPrice(e.target.value);
   }
 
   const handleAddSpool = () => {
@@ -75,11 +85,12 @@ function App() {
     setSpools(updated);
   }
 // Збереження результатів при переході на новий діаметр
-    const handleNewDiameter = () => {
+  const handleNewDiameter = () => {
     const newDiametrQuestion = confirm('Переходимо на новий діаметр?');
     if (!newDiametrQuestion) return;
 
     setResults([...results, {  
+      data:today.toLocaleDateString(),
       diameter: formatDecimal(diameterDigits, 2),   // правильний діаметр
       price,
       countSpool: currentCount,
@@ -87,70 +98,89 @@ function App() {
       totalTons: currentTons,
       spools: [...spools]
     }]);
-
-    setDiameter('');
+    //setDiameter('');
     setDiameterDigits('');
     setPrice('');
     setSpools([]);
     setCurrentMassa(850);
+        useEffect(() => {
+          console.log('results оновились:', results);
+         }, [results]);
   }
-  
+  //номер стана у localstoridge
+  const saveStan = (stan) => {
+    setStan(stan)
+    localStorage.setItem('stan', stan);
+  }
+  //тип катанки у localstoridge
+  const savekatanka = (typeKat) => {
+    setKatanka(typeKat)
+    localStorage.setItem('katanka', typeKat);
+  }
+  //заміна у localstoridge
+  const savezamina = (zamina) => {
+    setreplasement(zamina)
+    localStorage.setItem('zamina', zamina);
+  }
+
   //пошук діаметра
 
   const searchDiameter = (stan, katanka, final, replasement) => {
-  console.log('Пошук:', { stan,katanka, final, replasement });
+    console.log('Пошук:', { stan,katanka, final, replasement });
 
-  const stans = {
-    6: stan6.data,
-    9: stan9.data
-  };
+    const stans = {
+      6: stan6.data,
+      9: stan9.data
+    };
 
-  const stanInfo = stans[+stan];
-  if (!stanInfo) {
-    console.error('Невідомий стан:', stan);
-    return null;
-  }
-
-  const filtered = stanInfo.filter(item => 
-    Number(item.section) == Number(katanka) &&
-    Number(item.replacement) == Number(replasement)
-  );
-  console.log('filtered',filtered);
-
-  if (filtered.length === 0) {
-    console.log('Нічого не знайдено');
-    return null;
-  }
-
-  // Точний збіг
-  const exact = filtered.find(item => 
-    Number(item.final_diameter_mm) === Number(final) / 100   // або diameter_mm — перевір у json
-  );
-  console.log('exact',exact)
-
-  if (exact) {
-    console.log('Знайдено точний:', exact);
-    setPrice(exact.rozcinka_grn);
-    setSpeed((exact.drawing_speed_m_per_min / 60).toFixed(2));
-    setProduction(exact.production_norm_kg);
-    setTimeNorm(exact.norm_time*60);
-    console.log('price',price)
-    return exact;
-  }
-
-  // Найближчий
-  let closest = filtered[0];
-  let minDiff = Math.abs(Number(filtered[0].final_diameter_mm) - Number(final) / 100);
-
-  for (const item of filtered) {
-    const diff = Math.abs(Number(item.final_diameter_mm) - Number(final) / 100);
-    if (diff < minDiff) {
-      minDiff = diff;
-      closest = item;
+    const stanInfo = stans[+stan];
+    if (!stanInfo) {
+      console.error('Невідомий стан:', stan);
+      return null;
     }
+
+    const filtered = stanInfo.filter(item => 
+      Number(item.section) == Number(katanka) &&
+      Number(item.replacement) == Number(replasement)
+    );
+    console.log('filtered',filtered);
+
+    if (filtered.length === 0) {
+      console.log('Нічого не знайдено');
+      return null;
+    }
+
+    // Точний збіг
+    const exact = filtered.find(item => 
+      Number(item.final_diameter_mm) === Number(final) / 100   // або diameter_mm — перевір у json
+    );
+    console.log('exact',exact)
+
+    if (exact) {
+      console.log('Знайдено точний:', exact);
+      setFindDiameter(exact.final_diameter_mm);
+      setPrice(exact.rozcinka_grn);
+      setSpeed((exact.drawing_speed_m_per_min / 60).toFixed(2));
+      setProduction(exact.production_norm_kg);
+      setTimeNorm(exact.norm_time*60);
+      console.log('price',price)
+      return exact;
+    }
+
+    // Найближчий
+    let closest = filtered[0];
+    let minDiff = Math.abs(Number(filtered[0].final_diameter_mm) - Number(final) / 100);
+
+    for (const item of filtered) {
+      const diff = Math.abs(Number(item.final_diameter_mm) - Number(final) / 100);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closest = item;
+      }
   }
 
   console.log('Найближчий:', closest);
+  setFindDiameter(closest.final_diameter_mm);
   setPrice(closest.rozcinka_grn);
   setSpeed((closest.drawing_speed_m_per_min / 60).toFixed(2));
   setProduction(closest.production_norm_kg);
@@ -170,14 +200,13 @@ function App() {
         </div>
         
         <div>
-          <Legend>Введіть № стана</Legend>
-          <select value={stan} onChange={(e) => setStan(e.target.value)}>
+          <select value={stan} onChange={(e) => saveStan(e.target.value)}>
             <option value="">-- Виберіть номер стана --</option>
             <option value="6">Стан № 6</option>
             <option value="9">Стан № 9</option>
           </select>
 
-      <Legend>Початковий діаметр дроту</Legend>
+      {/*<Legend>Початковий діаметр дроту</Legend>
           
           <InputNumber
             id='init_diameter'
@@ -186,7 +215,7 @@ function App() {
             step="0.01"
             value={formatDecimal(initDiameter, 1)}
             onChange={handleInitDiameterChange}
-          />
+          />*/}
 
           <Legend>Діаметр дроту</Legend>
           <InputNumber
@@ -199,7 +228,7 @@ function App() {
           />
         </div>
         <div>
-           <select value={katanka} onChange={(e) => setKatanka(e.target.value)}>
+           <select value={katanka} onChange={(e) => savekatanka(e.target.value)}>
             <option value="">-- Виберіть тип катанки --</option>
             <option value="1">Торгова</option>
             <option value="4">СВІВ(А)</option>
@@ -212,7 +241,7 @@ function App() {
           </select>
         </div>
         <div>
-           <select value={replasement} onChange={(e) => setreplasement(e.target.value)}>
+           <select value={replasement} onChange={(e) => savezamina(e.target.value)}>
             <option value="">-- Заміна --</option>
             <option value="0">великовантажні мотки</option>
             <option value="4">великовантажні мотки переробна заготівля</option>
@@ -227,9 +256,14 @@ function App() {
         </div>
         <div>
           
+
+          <Legend>діаметр</Legend>
+          <InputNumber
+            value={findDiameter}  
+          />
           <Legend>ціна за тону</Legend>
           <InputNumber
-            value={formatDecimal(price, 2)*100}  
+            value={Number(price).toFixed(2)}   onChange={  handlePriceChange}
           />
           <Legend>швидкість волочіння м/с</Legend>
           <InputNumber
@@ -240,9 +274,9 @@ function App() {
           <InputNumber
              value={production} readOnly
           />
-           <Legend>норма часу год/т</Legend>
+           <Legend>норма часу хв/т</Legend>
           <InputNumber
-            value={timeNorm} readOnly
+            value={+timeNorm*60} readOnly
           />
 
         </div>
@@ -259,7 +293,8 @@ function App() {
               style={{ width: '80px' }}
             />
             <button onClick={handleAddSpool}>▲ Додати</button>
-            <button onClick={handleRemoveSpool} disabled={currentCount === 0}>▼ Видалити останню</button><button onClick={handleRemoveSpool} disabled={currentCount === 0}>▼ Видалити останню</button>
+            <button onClick={handleRemoveSpool} disabled={currentCount === 0}>▼ Видалити останню</button>
+            
           </div>
         </div>
 
@@ -286,7 +321,7 @@ function App() {
                     type='number'
                     value={spool.massa}
                     onChange={(e) => handleSpoolMassaChange(index, e.target.value)}
-                    style={{ width: '35px', fontSize: '13px', padding: '2px 4px' }}
+                    style={{ width: '30px', fontSize: '13px', padding: '2px 4px' }}
                   />
                   <span>кг</span>
                   <button
