@@ -1,11 +1,19 @@
 import { useState } from 'react'
+//import { useEffect } from "react";
 import {Today, Legend, InputNumber, Container} from "./App.styled.js"
 import './App.css'
 import stan6 from './Data/6.json';
 import stan9 from './Data/9.json';
+import { BurgerMenu } from './Components/burgerMenu/burgerMenu.jsx';
+import { Routes } from './Components/Routes/Routes.jsx';
+
+import { supabase } from './supabase.js';
+
 
 function App() {
-  //const [diameter, setDiameter] = useState(3);
+ 
+
+  
   const [stan, setStan] = useState(()=> {
     const savedStan = localStorage.getItem('stan');
     return savedStan ? savedStan : '';
@@ -55,11 +63,11 @@ function App() {
     setDiameterDigits(digits);
   }
 
-  const handleInitDiameterChange = (e) => {
+  {/*const handleInitDiameterChange = (e) => {
     const digits = e.target.value.replace(/\D/g, "");
     setInitDiameter(digits);
     console.log('init diameter',initDiameter)
-  } 
+  }*/ }
 
   const handlePriceChange = (e) => {
    // const p = e.target.value  );
@@ -103,10 +111,51 @@ function App() {
     setPrice('');
     setSpools([]);
     setCurrentMassa(850);
-        useEffect(() => {
-          console.log('results оновились:', results);
-         }, [results]);
+        
   }
+  // зберігаємо дані зміни у локалсторідж
+  const handleSaveShift = () => {
+    const newResult = {
+    data: today.toLocaleDateString(),
+    diameter: formatDecimal(diameterDigits, 2),
+    price,
+    countSpool: currentCount,
+    totalMoney: currentMoney,
+    totalTons: currentTons,
+    spools: [...spools]
+    };
+
+    // результати з поточним новим діаметром
+    const updatedResults = [...results, newResult];
+
+    // оновили state
+    setResults(updatedResults);
+      // дістаємо старі збережені зміни
+      
+      // тестове видалення даних з локалсторідж
+      localStorage.removeItem("workShifts");
+      
+    const savedShifts =
+      JSON.parse(localStorage.getItem("workShifts")) || [];
+    // нова зміна з датою
+    const shift = {
+      shiftDate: today.toLocaleDateString(),
+      results: updatedResults
+    };
+
+    // запис в localStorage
+    localStorage.setItem(
+      "workShifts",
+      JSON.stringify([...savedShifts, shift])
+    );
+
+    // очистка як у handleNewDiameter
+    setDiameterDigits('');
+    setPrice('');
+    setSpools([]);
+    setCurrentMassa(850);
+  }
+
   //номер стана у localstoridge
   const saveStan = (stan) => {
     setStan(stan)
@@ -162,8 +211,8 @@ function App() {
       setPrice(exact.rozcinka_grn);
       setSpeed((exact.drawing_speed_m_per_min / 60).toFixed(2));
       setProduction(exact.production_norm_kg);
-      setTimeNorm(exact.norm_time*60);
-      console.log('price',price)
+      setTimeNorm(exact.norm_time);
+      console.log('price',exact.norm_time)
       return exact;
     }
 
@@ -189,11 +238,22 @@ function App() {
   return closest;
 };
 
+//пошук маршрута    sb_secret_8LlvLmLIS6W-Y-hHYPRrIw_8Nv10KOx
+// project id qacwmjsapfwqvyrvxapg
+// publishable key - sb_publishable__7ulnRhjN8TBhldT9duq_Q_CCgNVBgM
+// API Url - https://qacwmjsapfwqvyrvxapg.supabase.co/rest/v1/
+const searchRoute = (stan, katanka, final, replasement) => {
+ 
+}
   return (
     <>
       <Container>
+        <div>
+          <BurgerMenu />
+          
+        </div>
         <h1>Калькулятор </h1>
-        <h2> Волочіння дроту </h2>
+        <h2> Волочільника дроту </h2>
         <div>
           <Today>сьогодні</Today>
           {today.toLocaleDateString()}
@@ -253,6 +313,7 @@ function App() {
         <div>
           
          <button onClick={()=>searchDiameter(stan, katanka, diameterDigits,replasement)}>Пошук</button>
+         <Routes />
         </div>
         <div>
           
@@ -262,9 +323,14 @@ function App() {
             value={findDiameter}  
           />
           <Legend>ціна за тону</Legend>
-          <InputNumber
-            value={Number(price).toFixed(2)}   onChange={  handlePriceChange}
-          />
+            <InputNumber
+            id='price'
+            type="text"
+            inputMode="decimal"
+            step="0.01"
+            value={price}
+            onChange={handlePriceChange}
+            />
           <Legend>швидкість волочіння м/с</Legend>
           <InputNumber
              value={speed} readOnly
@@ -276,7 +342,7 @@ function App() {
           />
            <Legend>норма часу хв/т</Legend>
           <InputNumber
-            value={+timeNorm*60} readOnly
+            value={(timeNorm*60).toFixed(0)} readOnly
           />
 
         </div>
@@ -344,6 +410,9 @@ function App() {
 
         <button onClick={handleNewDiameter} style={{ marginTop: '16px' }}>
           Новий діаметр
+        </button>
+        <button onClick={handleSaveShift} style={{ marginTop: '16px' }}>
+          Зберегти дані
         </button>
 
         <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#e8f5e9', borderRadius: '10px', border: '1px solid #81c784' }}>
