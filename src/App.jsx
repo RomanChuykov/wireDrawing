@@ -238,7 +238,7 @@ function App() {
   return closest;
 };
 
-//пошук маршрута    гкеф_sb_secret_8LlvLmLIS6W-Y-hHYPRrIw_8Nv10KOx
+//пошук маршрута    
 // project id qacwmjsapfwqvyrvxapg
 // publishable key - sb_publishable__7ulnRhjN8TBhldT9duq_Q_CCgNVBgM
 // API Url - https://qacwmjsapfwqvyrvxapg.supabase.co/rest/v1/
