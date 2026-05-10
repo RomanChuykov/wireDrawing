@@ -26,19 +26,59 @@ function App() {
     const typeKatanki = localStorage.getItem('katanka');
     return typeKatanki ? typeKatanki : '';
   });
-
+  const [spools, setSpools] = useState(() => {
+  const saved = localStorage.getItem('currentShift');
+  return saved ? JSON.parse(saved).spools ?? [] : [];
+});
+const [results, setResults] = useState(() => {
+  const saved = localStorage.getItem('currentShift');
+  return saved ? JSON.parse(saved).results ?? [] : [];
+});
+const [diameterDigits, setDiameterDigits] = useState(() => {
+  const saved = localStorage.getItem('currentShift');
+  return saved ? JSON.parse(saved).diameterDigits ?? "" : "";
+});
+const [initDiameter, setInitDiameter] = useState("");
+const [price, setPrice] = useState(() => {
+  const saved = localStorage.getItem('currentShift');
+  return saved ? JSON.parse(saved).price ?? '' : '';
+});
+const [findDiameter, setFindDiameter] = useState(() => {
+  const saved = localStorage.getItem('currentShift');
+  return saved ? JSON.parse(saved).findDiameter ?? '' : '';
+});
+const [speed, setSpeed] = useState(() => {
+  const saved = localStorage.getItem('currentShift');
+  return saved ? JSON.parse(saved).speed ?? '' : '';
+});
+const [production, setProduction] = useState(() => {
+  const saved = localStorage.getItem('currentShift');
+  return saved ? JSON.parse(saved).production ?? '' : '';
+});
+const [timeNorm, setTimeNorm] = useState(() => {
+  const saved = localStorage.getItem('currentShift');
+  return saved ? JSON.parse(saved).timeNorm ?? '' : '';
+});
+  
+  
+  
   const [currentMassa, setCurrentMassa] = useState(850);
-  const [spools, setSpools] = useState([]); // [{massa: 800}, {massa: 850}, ...]
-  const [results, setResults] = useState([]);
-  const [diameterDigits, setDiameterDigits] = useState("");
-  const [initDiameter,setInitDiameter]= useState("")
-  const [price, setPrice] = useState('');
-  const [findDiameter, setFindDiameter] = useState('');
-  const [speed, setSpeed] = useState('');
-  const [production, setProduction] = useState('');
-  const [timeNorm, setTimeNorm] = useState('');
-
-  const today = new Date();
+  //const [spools, setSpools] = useState([]); // [{massa: 800}, {massa: 850}, ...]
+  //const [results, setResults] = useState([]);
+//  const [diameterDigits, setDiameterDigits] = useState("");
+  //const [initDiameter,setInitDiameter]= useState("")
+  //const [price, setPrice] = useState('');
+  //const [findDiameter, setFindDiameter] = useState('');
+  //const [speed, setSpeed] = useState('');
+  //const [production, setProduction] = useState('');
+  //const [timeNorm, setTimeNorm] = useState('');
+ 
+ const getToday = () => {
+    const d = new Date();
+    return d.toISOString().split('T')[0]; // формат YYYY-MM-DD
+  } ;
+ 
+  const [today, setToday] = useState(getToday());
 
   
 
@@ -51,6 +91,8 @@ function App() {
   // === ЗАГАЛЬНІ РОЗРАХУНКИ ЗА ВСЮ СЕСІЮ ===
   const grandTotalTons = results.reduce((sum, r) => sum + (r.totalTons || 0), 0) + currentTons;
   const grandTotalMoney = results.reduce((sum, r) => sum + (r.totalMoney || 0), 0) + currentMoney;
+
+  
 
   function formatDecimal(digits, decimals = 2) {
     if (!digits) return '0.00';
@@ -69,92 +111,103 @@ function App() {
     console.log('init diameter',initDiameter)
   }*/ }
 
+
   const handlePriceChange = (e) => {
-   // const p = e.target.value  );
     setPrice(e.target.value);
   }
 
   const handleAddSpool = () => {
-    setSpools(prev => [...prev, { massa: currentMassa }]);
-  }
+  const updatedSpools = [...spools, { massa: currentMassa }];
+  setSpools(updatedSpools);
+  saveCurrentShift(results, updatedSpools);
+}
 
   const handleRemoveSpool = () => {
-    if (spools.length === 0) return;
-    setSpools(prev => prev.slice(0, -1));
-  }
+  if (spools.length === 0) return;
+  const updatedSpools = spools.slice(0, -1);
+  setSpools(updatedSpools);
+  saveCurrentShift(results, updatedSpools);
+}
 
-  const handleRemoveSpoolAt = (index) => {
-    setSpools(prev => prev.filter((_, i) => i !== index));
-  }
+ const handleSpoolMassaChange = (index, value) => {
+  const updatedSpools = [...spools];
+  updatedSpools[index] = { ...updatedSpools[index], massa: Number(value) };
+  setSpools(updatedSpools);
+  saveCurrentShift(results, updatedSpools);
+}
 
-  const handleSpoolMassaChange = (index, value) => {
-    const updated = [...spools];
-    updated[index] = { ...updated[index], massa: Number(value) };
-    setSpools(updated);
-  }
+  
 // Збереження результатів при переході на новий діаметр
   const handleNewDiameter = () => {
-    const newDiametrQuestion = confirm('Переходимо на новий діаметр?');
-    if (!newDiametrQuestion) return;
+  const newDiametrQuestion = confirm('Переходимо на новий діаметр?');
+  if (!newDiametrQuestion) return;
 
-    setResults([...results, {  
-      data:today.toLocaleDateString(),
-      diameter: formatDecimal(diameterDigits, 2),   // правильний діаметр
-      price,
-      countSpool: currentCount,
-      totalMoney: currentMoney,
-      totalTons: currentTons,
-      spools: [...spools]
-    }]);
-    //setDiameter('');
-    setDiameterDigits('');
-    setPrice('');
-    setSpools([]);
-    setCurrentMassa(850);
-        
-  }
-  // зберігаємо дані зміни у локалсторідж
-  const handleSaveShift = () => {
-    const newResult = {
-    data: today.toLocaleDateString(),
+  const updatedResults = [...results, {
+    data: today,
     diameter: formatDecimal(diameterDigits, 2),
     price,
     countSpool: currentCount,
     totalMoney: currentMoney,
     totalTons: currentTons,
     spools: [...spools]
-    };
+  }];
 
-    // результати з поточним новим діаметром
-    const updatedResults = [...results, newResult];
+  setResults(updatedResults);
+  // зберігаємо у поточну зміну, скидаємо дані по діаметру
+  saveCurrentShift(updatedResults, [], {
+    diameterDigits: '',
+    price: '',
+    findDiameter: '',
+    speed: '',
+    production: '',
+    timeNorm: '',
+  });
 
-    // оновили state
-    setResults(updatedResults);
-      // дістаємо старі збережені зміни
-      
-      // тестове видалення даних з локалсторідж
-      localStorage.removeItem("workShifts");
-      
-    const savedShifts =
-      JSON.parse(localStorage.getItem("workShifts")) || [];
-    // нова зміна з датою
-    const shift = {
-      shiftDate: today.toLocaleDateString(),
-      results: updatedResults
-    };
+  setDiameterDigits('');
+  setPrice('');
+  setFindDiameter('');
+  setSpeed('');
+  setProduction('');
+  setTimeNorm('');
+  setSpools([]);
+  setCurrentMassa(850);
+};
+  // зберігаємо дані зміни у локалсторідж
+ const handleSaveShift = () => {
+  const newResult = {
+    data: today,
+    diameter: formatDecimal(diameterDigits, 2),
+    price,
+    countSpool: currentCount,
+    totalMoney: currentMoney,
+    totalTons: currentTons,
+    spools: [...spools]
+  };
 
-    // запис в localStorage
-    localStorage.setItem(
-      "workShifts",
-      JSON.stringify([...savedShifts, shift])
-    );
+  const updatedResults = [...results, newResult];
 
-    // очистка як у handleNewDiameter
-    setDiameterDigits('');
-    setPrice('');
-    setSpools([]);
-    setCurrentMassa(850);
-  }
+  // Зберігаємо архів усіх змін — тільки додаємо, не перезаписуємо
+  const savedShifts = JSON.parse(localStorage.getItem('workShifts')) || [];
+  const shift = {
+    shiftDate: today,
+    results: updatedResults
+  };
+  localStorage.setItem('workShifts', JSON.stringify([...savedShifts, shift]));
+
+  // Обнуляємо ключ поточної зміни
+  localStorage.removeItem('currentShift');
+
+  // Скидаємо весь стейт
+  setResults([]);
+  setDiameterDigits('');
+  setPrice('');
+  setFindDiameter('');
+  setSpeed('');
+  setProduction('');
+  setTimeNorm('');
+  setSpools([]);
+  setCurrentMassa(850);
+};
 
   //номер стана у localstoridge
   const saveStan = (stan) => {
@@ -171,6 +224,21 @@ function App() {
     setreplasement(zamina)
     localStorage.setItem('zamina', zamina);
   }
+// додає у локалсторідж дані поточної зміни
+  const saveCurrentShift = (updatedResults, updatedSpools, extra = {}) => {
+  const current = {
+    results: updatedResults,
+    spools: updatedSpools,
+    date: today,
+    diameterDigits: extra.diameterDigits ?? diameterDigits,
+    price: extra.price !== undefined ? extra.price : price,
+    findDiameter: extra.findDiameter ?? findDiameter,
+    speed: extra.speed ?? speed,
+    production: extra.production ?? production,
+    timeNorm: extra.timeNorm ?? timeNorm,
+  };
+  localStorage.setItem('currentShift', JSON.stringify(current));
+};
 
   //пошук діаметра
 
@@ -209,10 +277,18 @@ function App() {
       console.log('Знайдено точний:', exact);
       setFindDiameter(exact.final_diameter_mm);
       setPrice(exact.rozcinka_grn);
+      //setPrice(String(Math.round(Number(exact.rozcinka_grn) * 100)));
       setSpeed((exact.drawing_speed_m_per_min / 60).toFixed(2));
       setProduction(exact.production_norm_kg);
       setTimeNorm(exact.norm_time);
       console.log('price',exact.norm_time)
+      saveCurrentShift(results, spools, {
+        findDiameter: exact.final_diameter_mm,
+        price: exact.rozcinka_grn,
+        speed: (exact.drawing_speed_m_per_min / 60).toFixed(2),
+        production: exact.production_norm_kg,
+        timeNorm: exact.norm_time,
+      });
       return exact;
     }
 
@@ -231,15 +307,23 @@ function App() {
   console.log('Найближчий:', closest);
   setFindDiameter(closest.final_diameter_mm);
   setPrice(closest.rozcinka_grn);
+  //setPrice(String(Math.round(Number(closest.rozcinka_grn) * 100)));
   setSpeed((closest.drawing_speed_m_per_min / 60).toFixed(2));
   setProduction(closest.production_norm_kg);
   setTimeNorm(closest.norm_time);
-  
+  saveCurrentShift(results, spools, {
+      findDiameter: closest.final_diameter_mm,
+      price: closest.rozcinka_grn,
+      speed: (closest.drawing_speed_m_per_min / 60).toFixed(2),
+      production: closest.production_norm_kg,
+      timeNorm: closest.norm_time,
+    });
   return closest;
 };
 
-//пошук маршрута    
-
+//пошук маршрута    гкеф_sb_secret_8LlvLmLIS6W-Y-hHYPRrIw_8Nv10KOx
+// project id qacwmjsapfwqvyrvxapg
+// publishable key - sb_publishable__7ulnRhjN8TBhldT9duq_Q_CCgNVBgM
 // API Url - https://qacwmjsapfwqvyrvxapg.supabase.co/rest/v1/
 const searchRoute = (stan, katanka, final, replasement) => {
  
@@ -255,7 +339,11 @@ const searchRoute = (stan, katanka, final, replasement) => {
         <h2> Волочільника дроту </h2>
         <div>
           <Today>сьогодні</Today>
-          {today.toLocaleDateString()}
+          <input
+              type="date"
+              value={today}
+              onChange={(e) => setToday(e.target.value)}
+          />
         </div>
         
         <div>
@@ -323,12 +411,12 @@ const searchRoute = (stan, katanka, final, replasement) => {
           />
           <Legend>ціна за тону</Legend>
             <InputNumber
-            id='price'
-            type="text"
-            inputMode="decimal"
-            step="0.01"
-            value={price}
-            onChange={handlePriceChange}
+              id='price'
+              type="text"
+              inputMode="decimal"
+              step="0.01"
+              value={price}
+              onChange={handlePriceChange}
             />
           <Legend>швидкість волочіння м/с</Legend>
           <InputNumber
