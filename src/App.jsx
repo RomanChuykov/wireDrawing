@@ -1,6 +1,6 @@
 import { useState } from 'react'
 //import { useEffect } from "react";
-import {Today, Legend, InputNumber, Container} from "./App.styled.js"
+import {Today, Legend, InputNumber, Container, Selects, Stan} from "./App.styled.js"
 import './App.css'
 import stan6 from './Data/6.json';
 import stan9 from './Data/9.json';
@@ -128,6 +128,14 @@ const [timeNorm, setTimeNorm] = useState(() => {
   setSpools(updatedSpools);
   saveCurrentShift(results, updatedSpools);
 }
+
+const handleRemoveSpoolAt = (index) => {
+  const updatedSpools = spools.filter((_, i) => i !== index);
+
+  setSpools(updatedSpools);
+
+  saveCurrentShift(results, updatedSpools);
+};
 
  const handleSpoolMassaChange = (index, value) => {
   const updatedSpools = [...spools];
@@ -335,7 +343,7 @@ const searchRoute = (stan, katanka, final, replasement) => {
           <BurgerMenu />
           
         </div>
-        <h1>Калькулятор </h1>
+        <h1>Помічник </h1>
         <h2> Волочільника дроту </h2>
         <div>
           <Today>сьогодні</Today>
@@ -347,35 +355,18 @@ const searchRoute = (stan, katanka, final, replasement) => {
         </div>
         
         <div>
-          <select value={stan} onChange={(e) => saveStan(e.target.value)}>
+          <Stan value={stan} onChange={(e) => saveStan(e.target.value)}>
             <option value="">-- Виберіть номер стана --</option>
             <option value="6">Стан № 6</option>
             <option value="9">Стан № 9</option>
-          </select>
+          </Stan>
+         </div>
+     
 
-      {/*<Legend>Початковий діаметр дроту</Legend>
           
-          <InputNumber
-            id='init_diameter'
-            type="text"
-            inputMode="decimal"
-            step="0.01"
-            value={formatDecimal(initDiameter, 1)}
-            onChange={handleInitDiameterChange}
-          />*/}
-
-          <Legend>Діаметр дроту</Legend>
-          <InputNumber
-            id='diameter'
-            type="text"
-            inputMode="decimal"
-            step="0.01"
-            value={formatDecimal(diameterDigits, 2)}
-            onChange={handleDiameterChange}
-          />
-        </div>
+       
         <div>
-           <select value={katanka} onChange={(e) => savekatanka(e.target.value)}>
+           <Selects value={katanka} onChange={(e) => savekatanka(e.target.value)}>
             <option value="">-- Виберіть тип катанки --</option>
             <option value="1">Торгова</option>
             <option value="4">СВІВ(А)</option>
@@ -385,22 +376,31 @@ const searchRoute = (stan, katanka, final, replasement) => {
             <option value="26">Напівфабрикат для фібри</option>
             <option value="29">Пружинний з окаліноломателем</option>
             
-          </select>
+          </Selects>
         </div>
         <div>
-           <select value={replasement} onChange={(e) => savezamina(e.target.value)}>
+           <Selects value={replasement} onChange={(e) => savezamina(e.target.value)}>
             <option value="">-- Заміна --</option>
             <option value="0">великовантажні мотки</option>
             <option value="4">великовантажні мотки переробна заготівля</option>
             <option value="16">мотки 400-600 кг</option>
            
-          </select>
+          </Selects>
         </div>
-
+        <Legend>Діаметр дроту</Legend>
+          <InputNumber
+            id='diameter'
+            type="text"
+            inputMode="decimal"
+            step="0.01"
+            value={formatDecimal(diameterDigits, 2)}
+            onChange={handleDiameterChange}
+          />
         <div>
           
          <button onClick={()=>searchDiameter(stan, katanka, diameterDigits,replasement)}>Пошук</button>
-         <Routes />
+         {//<Routes />
+         }
         </div>
         <div>
           
@@ -431,7 +431,12 @@ const searchRoute = (stan, katanka, final, replasement) => {
           <InputNumber
             value={(timeNorm*60).toFixed(0)} readOnly
           />
-
+          <button onClick={handleNewDiameter} style={{ marginTop: '16px' }}>
+              Новий діаметр
+          </button>
+          <button onClick={handleSaveShift} style={{ marginTop: '16px' }}>
+            Зберегти дані
+          </button>
         </div>
 
         {/* Додавання шпуль */}
@@ -495,12 +500,7 @@ const searchRoute = (stan, katanka, final, replasement) => {
           </div>
         )}
 
-        <button onClick={handleNewDiameter} style={{ marginTop: '16px' }}>
-          Новий діаметр
-        </button>
-        <button onClick={handleSaveShift} style={{ marginTop: '16px' }}>
-          Зберегти дані
-        </button>
+        
 
         <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#e8f5e9', borderRadius: '10px', border: '1px solid #81c784' }}>
   
@@ -509,13 +509,7 @@ const searchRoute = (stan, katanka, final, replasement) => {
   <p><strong>Тон:</strong> {currentTons.toFixed(3)} т</p>
   <p><strong>Шпуль:</strong> {currentCount} шт.</p>
 
-  <hr style={{ margin: '12px 0' }} />
-
-  <h4 style={{ margin: '0 0 10px 0', color: '#1976d2' }}>📊 Всього за всю сесію</h4>
-  <p><strong>Заробив усього:</strong> <span style={{ fontSize: '1.35em', color: '#1976d2', fontWeight: 'bold' }}>
-    {grandTotalMoney.toFixed(2)}
-  </span> грн</p>
-  <p><strong>Тон усього:</strong> {grandTotalTons.toFixed(3)} т</p>
+  
 </div>
 
         {results.length > 0 && (
@@ -560,6 +554,15 @@ const searchRoute = (stan, katanka, final, replasement) => {
             ))}
           </div>
         )}
+        <div>
+          <hr style={{ margin: '12px 0' }} />
+
+  <h4 style={{ margin: '0 0 10px 0', color: '#1976d2' }}>📊 Всього за всю сесію</h4>
+  <p><strong>Заробив усього:</strong> <span style={{ fontSize: '1.35em', color: '#1976d2', fontWeight: 'bold' }}>
+    {grandTotalMoney.toFixed(2)}
+  </span> грн</p>
+  <p><strong>Тон усього:</strong> {grandTotalTons.toFixed(3)} т</p> 
+        </div>
       </Container>
     </>
   )

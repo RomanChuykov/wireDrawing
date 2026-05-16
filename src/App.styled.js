@@ -16,8 +16,21 @@ export const Legend=styled.span`
     margin-right:10px;
 `;
 export const InputNumber = styled.input`
-    width: 80px;
+    width: 50px;
   
 `;
-  
+export const Selects = styled.select`    
+    
+    width: 250px;
+    margin-left: 10px;
+    margin-right:10px;
+    overflow: hidden;
+`;
 
+export const Stan = styled.select`    
+    
+    width: 80px;
+    margin-left: 10px;
+    margin-right:10px;
+    overflow: hidden;
+`;

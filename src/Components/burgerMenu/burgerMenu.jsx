@@ -1,15 +1,24 @@
 import { useState } from 'react'
 import { HistoryModal } from './HistoryModal'
+import { DeleteDayModal } from './DeleteDayModal'
+import { ShiftCalendarModal } from './ShiftCalendarModal'
 
-export const BurgerMenu = ({ userData }) => {
+export const BurgerMenu = () => {
 
   const [isOpen, setIsOpen] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
+  const [showDeleteDay, setShowDeleteDay] = useState(false)
+  const [showShiftCalendar, setShowShiftCalendar] = useState(false)
 
   const menuItems = [
     { label: '🏠 Головна', href: '#', onClick: null },
-    { label: '🗑️ Видалити день', href: '#', onClick: null },
+    {
+      label: '🗑️ Видалити день',
+      href: null,
+      onClick: () => { setIsOpen(false); setShowDeleteDay(true) }
+    },
     { label: '📋 Історія змін', href: null, onClick: () => { setIsOpen(false); setShowHistory(true) } },
+    { label: '📅 Календар змін', href: null, onClick: () => { setIsOpen(false); setShowShiftCalendar(true) } },
     { label: '⚙️ Налаштування', href: '#settings', onClick: null },
     { label: 'ℹ️ Про програму', href: '#about', onClick: null },
   ]
@@ -54,27 +63,26 @@ export const BurgerMenu = ({ userData }) => {
                 borderBottom: i < menuItems.length - 1 ? '1px solid #f0f0f0' : 'none',
                 background: 'none', border: 'none', width: '100%', textAlign: 'left',
               }
-
               if (item.onClick) {
-                return (
-                  <button key={i} style={sharedStyle} onClick={item.onClick}>
-                    {item.label}
-                  </button>
-                )
+                return <button key={i} style={sharedStyle} onClick={item.onClick}>{item.label}</button>
               }
-
-              return (
-                <a key={i} href={item.href} onClick={() => setIsOpen(false)} style={sharedStyle}>
-                  {item.label}
-                </a>
-              )
+              return <a key={i} href={item.href} onClick={() => setIsOpen(false)} style={sharedStyle}>{item.label}</a>
             })}
           </div>
         </>
       )}
 
-      {showHistory && (
-        <HistoryModal onClose={() => setShowHistory(false)} />
+      {showHistory && <HistoryModal onClose={() => setShowHistory(false)} />}
+
+      {showDeleteDay && (
+        <DeleteDayModal
+          onClose={() => setShowDeleteDay(false)}
+          onDeleted={() => {}}
+        />
+      )}
+
+      {showShiftCalendar && (
+        <ShiftCalendarModal onClose={() => setShowShiftCalendar(false)} />
       )}
     </>
   )
