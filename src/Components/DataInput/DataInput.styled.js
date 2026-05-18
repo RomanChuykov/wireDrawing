@@ -28,7 +28,7 @@ export const Row = styled.div`
 `;
 
 export const Label = styled.label`
-  width: 160px;
+  width: 140px;
   font-size: 0.85rem;
   color: #546e7a;
   font-weight: 500;

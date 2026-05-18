@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   TriggerBtn,
   Overlay,
@@ -90,7 +90,7 @@ function calcAutoRoute(dIn, dOut, nBlocks) {
 export function Routes() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [sec1Open, setSec1Open] = useState(false);
+  const [sec1Open, setSec1Open] = useState(true);
   const [manKatanka, setManKatanka] = useState('');
   const [manWire, setManWire] = useState('');
   const [manBlocks, setManBlocks] = useState('');
@@ -99,25 +99,17 @@ export function Routes() {
   const manN = parseInt(manBlocks, 10);
   const manValid = !isNaN(manN) && manN >= 1 && manN <= 20;
 
-  const manDiffsView = useMemo(() => {
-    if (!manValid) return [];
-    return Array.from({ length: manN }, (_, i) => manDiffsInput[i] ?? '');
-  }, [manDiffsInput, manN, manValid]);
-
-  const handleManBlocksChange = val => {
-    setManBlocks(val);
-
-    const nextN = parseInt(val, 10);
-    if (isNaN(nextN) || nextN < 1 || nextN > 20) {
+  useEffect(() => {
+    if (!manValid) {
       setManDiffsInput([]);
       return;
     }
 
     setManDiffsInput(prev => {
-      if (nextN > prev.length) return [...prev, ...Array(nextN - prev.length).fill('')];
-      return prev.slice(0, nextN);
+      if (manN > prev.length) return [...prev, ...Array(manN - prev.length).fill('')];
+      return prev.slice(0, manN);
     });
-  };
+  }, [manN, manValid]);
 
   const setManDiff = (i, val) => {
     setManDiffsInput(prev => {
@@ -129,19 +121,19 @@ export function Routes() {
 
   const manDiams = useMemo(() => {
     if (!manValid || manKatanka === '') return [];
-    return calcDiametersByDiffs(manKatanka, manDiffsView);
-  }, [manKatanka, manDiffsView, manValid]);
+    return calcDiametersByDiffs(manKatanka, manDiffsInput);
+  }, [manKatanka, manDiffsInput, manValid]);
 
   const manLastDiam = manDiams[manN - 1];
   const manWireVal = parseFloat(manWire);
   const manMismatch = manWire !== '' && manLastDiam !== null && !isNaN(manLastDiam) && !isNaN(manWireVal)
     && Math.abs(manLastDiam - manWireVal) > 0.005;
 
-  const [sec2Open, setSec2Open] = useState(false);
+  const [sec2Open, setSec2Open] = useState(true);
   const [autoKatanka, setAutoKatanka] = useState('');
   const [autoWire, setAutoWire] = useState('');
   const [autoBlocks, setAutoBlocks] = useState('');
-  const [taper, setTaper] = useState('20');
+  const [taper, setTaper] = useState('10');
   const [autoDiamsInput, setAutoDiamsInput] = useState([]);
 
   const autoN = parseInt(autoBlocks, 10);
@@ -154,31 +146,22 @@ export function Routes() {
     return calcAutoRoute(dIn, dOut, autoN).slice(1);
   }, [autoKatanka, autoWire, autoN, autoValid]);
 
-  const autoDiamsView = useMemo(() => {
-    if (!autoValid) return [];
-    return Array.from({ length: autoN }, (_, i) => {
-      const edited = autoDiamsInput[i];
-      if (edited !== undefined && edited !== '') return edited;
-      return calculatedAutoDiams[i] !== undefined ? fmt2(calculatedAutoDiams[i]) : '';
+  useEffect(() => {
+    if (!autoValid) {
+      setAutoDiamsInput([]);
+      return;
+    }
+
+    setAutoDiamsInput(prev => {
+      const next = Array.from({ length: autoN }, (_, i) => {
+        const current = prev[i];
+        if (current !== undefined && current !== '') return current;
+        return calculatedAutoDiams[i] !== undefined ? fmt2(calculatedAutoDiams[i]) : '';
+      });
+
+      return next;
     });
-  }, [autoDiamsInput, autoN, autoValid, calculatedAutoDiams]);
-
-  const resetAutoDiams = () => setAutoDiamsInput([]);
-
-  const handleAutoKatankaChange = val => {
-    setAutoKatanka(val);
-    resetAutoDiams();
-  };
-
-  const handleAutoWireChange = val => {
-    setAutoWire(val);
-    resetAutoDiams();
-  };
-
-  const handleAutoBlocksChange = val => {
-    setAutoBlocks(val);
-    resetAutoDiams();
-  };
+  }, [autoN, autoValid, calculatedAutoDiams]);
 
   const setAutoDiam = (i, val) => {
     setAutoDiamsInput(prev => {
@@ -190,13 +173,13 @@ export function Routes() {
 
   const autoAllDiams = useMemo(() => {
     if (!autoValid || autoKatanka === '') return [];
-    return [parseFloat(autoKatanka), ...autoDiamsView.map(d => parseFloat(d))];
-  }, [autoKatanka, autoDiamsView, autoValid]);
+    return [parseFloat(autoKatanka), ...autoDiamsInput.map(d => parseFloat(d))];
+  }, [autoKatanka, autoDiamsInput, autoValid]);
 
   const autoDiffs = useMemo(() => {
     if (autoAllDiams.length < 2) return [];
-    return calcDiffs(autoKatanka, autoDiamsView);
-  }, [autoAllDiams.length, autoKatanka, autoDiamsView]);
+    return calcDiffs(autoKatanka, autoDiamsInput);
+  }, [autoAllDiams.length, autoKatanka, autoDiamsInput]);
 
   const autoReduction = useMemo(() => {
     const dIn = parseFloat(autoKatanka);
@@ -212,7 +195,7 @@ export function Routes() {
     return Math.ceil(2 * Math.log(dIn / dOut) / 0.28);
   }, [autoKatanka, autoWire]);
 
-  const autoLastDiam = parseFloat(autoDiamsView[autoN - 1]);
+  const autoLastDiam = parseFloat(autoDiamsInput[autoN - 1]);
   const autoWireVal = parseFloat(autoWire);
   const autoMismatch = autoWire !== '' && !isNaN(autoLastDiam) && !isNaN(autoWireVal)
     && Math.abs(autoLastDiam - autoWireVal) > 0.005;
@@ -249,7 +232,7 @@ export function Routes() {
                 <ParamField>
                   <ParamLabel>К-сть блоків</ParamLabel>
                   <NumInput type="number" step="1" min="1" max="20" inputMode="numeric"
-                    value={manBlocks} onChange={e => handleManBlocksChange(e.target.value)} />
+                    value={manBlocks} onChange={e => setManBlocks(e.target.value)} />
                 </ParamField>
               </ParamGrid>
 
@@ -267,7 +250,7 @@ export function Routes() {
                               type="number"
                               step="0.01"
                               inputMode="decimal"
-                              value={manDiffsView[i] ?? ''}
+                              value={manDiffsInput[i] ?? ''}
                               onChange={e => setManDiff(i, e.target.value)}
                               $compact
                             />
@@ -302,17 +285,17 @@ export function Routes() {
                 <ParamField>
                   <ParamLabel>Ø катанки (мм)</ParamLabel>
                   <NumInput type="number" step="0.1" inputMode="decimal"
-                    value={autoKatanka} onChange={e => handleAutoKatankaChange(e.target.value)} />
+                    value={autoKatanka} onChange={e => setAutoKatanka(e.target.value)} />
                 </ParamField>
                 <ParamField>
                   <ParamLabel>Ø дроту (мм)</ParamLabel>
                   <NumInput type="number" step="0.01" inputMode="decimal"
-                    value={autoWire} onChange={e => handleAutoWireChange(e.target.value)} />
+                    value={autoWire} onChange={e => setAutoWire(e.target.value)} />
                 </ParamField>
                 <ParamField>
                   <ParamLabel>К-сть блоків</ParamLabel>
                   <NumInput type="number" step="1" min="1" max="20" inputMode="numeric"
-                    value={autoBlocks} onChange={e => handleAutoBlocksChange(e.target.value)} />
+                    value={autoBlocks} onChange={e => setAutoBlocks(e.target.value)} />
                 </ParamField>
                 <ParamField>
                   <ParamLabel>TAPER (°)</ParamLabel>
@@ -354,7 +337,7 @@ export function Routes() {
                               type="number"
                               step="0.01"
                               inputMode="decimal"
-                              value={autoDiamsView[i] ?? ''}
+                              value={autoDiamsInput[i] ?? ''}
                               onChange={e => setAutoDiam(i, e.target.value)}
                               $compact
                             />
