@@ -11,7 +11,7 @@ export const BurgerMenu = () => {
   const [showShiftCalendar, setShowShiftCalendar] = useState(false)
 
   const menuItems = [
-    { label: '🏠 Головна', href: '#', onClick: null },
+    {/* label: '🏠 Головна', href: '#', onClick: null*/ },
     {
       label: '🗑️ Видалити день',
       href: null,
@@ -19,8 +19,8 @@ export const BurgerMenu = () => {
     },
     { label: '📋 Історія змін', href: null, onClick: () => { setIsOpen(false); setShowHistory(true) } },
     { label: '📅 Календар змін', href: null, onClick: () => { setIsOpen(false); setShowShiftCalendar(true) } },
-    { label: '⚙️ Налаштування', href: '#settings', onClick: null },
-    { label: 'ℹ️ Про програму', href: '#about', onClick: null },
+    { /*label: '⚙️ Налаштування', href: '#settings', onClick: null */},
+    { /*label: 'ℹ️ Про програму', href: '#about', onClick: null*/ },
   ]
 
   return (
