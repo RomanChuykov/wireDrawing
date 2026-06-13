@@ -513,6 +513,23 @@
       "norm_time": 1.03,
       "rozcinka_grn": 168.08
     },
+     {
+      "section": "21",
+      "initial_diameter_mm": 5.5,
+      "replacement": 0,
+      "final_diameter_mm": 2.30,
+      "weight_per_meter_kg": 0.0326,
+      "drawing_speed_m_per_min": 930,
+      "production_norm_kg": 20009,
+      "staff": "1 1 5",
+      "tariff_per_hour_grn": 385.11,
+      "kvo": 0.68,
+      "norm_production_service_kg": 14878,
+      "norm_obslugov": 14606,
+      "coefficient": 4.656,
+      "norm_time": 0.75,
+      "rozcinka_grn": 122.78
+     },
 	    {
       "section": "21",
       "initial_diameter_mm": 5.5,
