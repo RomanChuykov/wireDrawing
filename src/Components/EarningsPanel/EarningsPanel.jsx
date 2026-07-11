@@ -11,7 +11,7 @@ export function EarningsPanel() {
   const {
     results,
     currentMoney, currentTons, currentCount,
-    grandTotalMoney, grandTotalTons,
+    grandTotalMoney, grandTotalTons,progressPercent,
   } = useShift();
 
   return (
@@ -29,6 +29,10 @@ export function EarningsPanel() {
           <StatLabel>Тон:</StatLabel>
           <span>{currentTons.toFixed(3)} т</span>
         </StatRow>
+          <StatRow>
+          <StatLabel>%:</StatLabel>
+          <span>{progressPercent}% від норми</span>
+          </StatRow>
         <StatRow>
           <StatLabel>Шпуль:</StatLabel>
           <span>{currentCount} шт.</span>

@@ -33,7 +33,9 @@ export function ShiftProvider({ children }) {
   const currentCount = spools.length;
   const grandTotalTons  = results.reduce((sum, r) => sum + (r.totalTons  || 0), 0) + currentTons;
   const grandTotalMoney = results.reduce((sum, r) => sum + (r.totalMoney || 0), 0) + currentMoney;
-
+  const progressPercent = production
+    ? Math.round((currentTons * 1000) / Number(production) * 100)
+  : 0;
   // ── Збереження поточної зміни в localStorage ─────────────────────────────
   const persistShift = (nextResults, nextSpools, extra = {}) => {
     localStorage.setItem('currentShift', JSON.stringify({
@@ -70,7 +72,7 @@ export function ShiftProvider({ children }) {
       today, setToday,
       // розрахунки
       currentTons, currentMoney, currentCount,
-      grandTotalTons, grandTotalMoney,
+      grandTotalTons, grandTotalMoney,progressPercent,
       // хелпери
       persistShift, resetShift,
     }}>

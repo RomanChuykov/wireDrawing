@@ -66,7 +66,7 @@ export function DataInput() {
     const nextSpeed      = (found.drawing_speed_m_per_min / 60).toFixed(2);
     const nextFindDiam   = found.final_diameter_mm;
     const nextPrice      = found.rozcinka_grn;
-    const nextProduction = found.production_norm_kg;
+    const nextProduction = found.norm_production_service_kg;
     const nextTimeNorm   = found.norm_time;
 
     setFindDiameter(nextFindDiam);

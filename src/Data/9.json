@@ -526,7 +526,7 @@
       "kvo": 0.68,
       "norm_production_service_kg": 14878,
       "norm_obslugov": 14606,
-      "coefficient": 4.656,
+      "coefficient": 4.606,
       "norm_time": 0.75,
       "rozcinka_grn": 122.78
      },
@@ -732,7 +732,7 @@
       "norm_obslugov": 17940,
       "coefficient": 5.203,
       "norm_time": 0.58,
-      "rozcinka_grn": 119
+      "rozcinka_grn": 95.00
     },
     {
       "section": "21",
