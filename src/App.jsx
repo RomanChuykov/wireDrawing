@@ -11,7 +11,7 @@ function App() {
     <ShiftProvider>
       <AppWrapper>
         <BurgerMenu />
-        <AppTitle>Помічник</AppTitle>
+        <AppTitle>Калькулятор</AppTitle>
         <AppSubtitle>Волочільника дроту</AppSubtitle>
 
         <DataInput />

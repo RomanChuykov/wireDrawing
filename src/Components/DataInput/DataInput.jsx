@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import stan6 from '../../Data/6.json';
 import stan9 from '../../Data/9.json';
+import stan15 from '../../Data/15.json';
 import { Routes } from '../Routes/Routes.jsx';
 import { useShift, formatDecimal } from '../../context/ShiftContext.jsx';
 import {
@@ -43,7 +44,7 @@ export function DataInput() {
 
   // ── Пошук діаметра ────────────────────────────────────────────────────────
   const searchDiameter = () => {
-    const stans = { 6: stan6.data, 9: stan9.data };
+    const stans = { 6: stan6.data, 9: stan9.data, 15: stan15.data};
     const stanInfo = stans[+stan];
     if (!stanInfo) return;
 
@@ -151,6 +152,7 @@ export function DataInput() {
           <option value="">-- Виберіть стан --</option>
           <option value="6">Стан № 6</option>
           <option value="9">Стан № 9</option>
+          <option value="15">Стан № 15</option>
         </StanSelect>
       </Row>
 
