@@ -18,7 +18,7 @@ export default defineConfig({
 
       manifest: {
         name: 'My React PWA',
-        short_name: 'ReactPWA',
+        short_name: 'Калькулятор волочильника',
         start_url: '/wireDrawing/', // ⚠️ важливо!
         display: 'standalone',
         background_color: '#ffffff',
