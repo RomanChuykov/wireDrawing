@@ -14,7 +14,7 @@ const modalStyle = {
   borderRadius: '14px',
   boxShadow: '0 8px 40px rgba(0,0,0,0.22)',
   width: '92vw',
-  maxWidth: '740px',
+  maxWidth: '400px',
   maxHeight: '85vh',
   display: 'flex',
   flexDirection: 'column',
@@ -70,16 +70,17 @@ const tableStyle = {
 }
 
 const thStyle = {
-  padding: '10px 14px',
-  textAlign: 'left',
+  padding: '10px 4px',
+  textAlign: 'center',
   fontWeight: '500',
-  fontSize: '13px',
+  fontSize: '12px',
   color: '#888',
   borderBottom: '1px solid #eee',
   position: 'sticky',
   top: 0,
   backgroundColor: '#fff',
-  whiteSpace: 'nowrap',
+  whiteSpace: 'wrap',
+  
 }
 
 const tdStyle = {
@@ -103,7 +104,7 @@ const MONTH_NAMES = [
 function formatMoney(val) {
   const n = parseFloat(val)
   if (isNaN(n)) return '—'
-  return n.toLocaleString('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₴'
+  return n.toLocaleString('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) 
 }
 
 function formatNum(val, digits = 3) {
@@ -115,7 +116,7 @@ function formatNum(val, digits = 3) {
 function formatPrice(val) {
   const n = parseFloat(val)
   if (isNaN(n)) return '—'
-  return n.toLocaleString('uk-UA') + ' ₴'
+  return n.toLocaleString('uk-UA')
 }
 
 /**
@@ -229,11 +230,11 @@ export function HistoryModal({ onClose }) {
             <table style={tableStyle}>
               <thead>
                 <tr>
-                  <th style={thStyle}>Дата</th>
+                  <th style={{ ...thStyle, textAlign: 'center' }}>Дата</th>
                   <th style={thStyle}>Діаметр, мм</th>
                   <th style={{ ...thStyle, textAlign: 'right' }}>Кількість, т</th>
                   <th style={{ ...thStyle, textAlign: 'right' }}>Ціна за т</th>
-                  <th style={{ ...thStyle, textAlign: 'right' }}>Зароблено</th>
+                  <th style={{ ...thStyle, textAlign: 'right'}}>Зароблено  ₴</th>
                 </tr>
               </thead>
               <tbody>
